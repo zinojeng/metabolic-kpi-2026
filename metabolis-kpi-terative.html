@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>代謝科 2026 年度目標與 KPI 互動對照平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            animation: fadeInDown 1s;
+        }
+
+        .meta-info {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .view-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .toggle-btn {
+            padding: 10px 25px;
+            border: 2px solid #667eea;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .search-bar {
+            padding: 20px 40px;
+            background: #f8f9fa;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #dee2e6;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .view-content {
+            display: none;
+        }
+
+        .view-content.active {
+            display: block;
+        }
+
+        .goal-section {
+            margin-bottom: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .goal-section:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .goal-header {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .goal-header:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #adb5bd 100%);
+        }
+
+        .goal-header h2 {
+            font-size: 1.3rem;
+            color: #495057;
+        }
+
+        .toggle-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .goal-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .goal-content.active {
+            padding: 20px;
+            max-height: 2000px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .comparison-table th:first-child {
+            width: 20%;
+        }
+
+        .year-2022 {
+            background-color: #fff3cd;
+            padding: 8px;
+            border-radius: 5px;
+            border-left: 3px solid #ffc107;
+        }
+
+        .year-2024 {
+            background-color: #d1ecf1;
+            padding: 8px;
+            border-radius: 5px;
+            border-left: 3px solid #17a2b8;
+        }
+
+        .year-2026 {
+            background-color: #d4edda;
+            padding: 8px;
+            border-radius: 5px;
+            border-left: 3px solid #28a745;
+        }
+
+        .kpi-badge {
+            background: #e7f5ff;
+            color: #1c7ed6;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #868e96;
+            margin-top: 5px;
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-around;
+            padding: 30px 0;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #dee2e6;
+            z-index: 0;
+        }
+
+        .timeline-item {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .timeline-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .timeline-item:nth-child(1) .timeline-dot {
+            background: #ffc107;
+        }
+
+        .timeline-item:nth-child(2) .timeline-dot {
+            background: #17a2b8;
+        }
+
+        .timeline-item:nth-child(3) .timeline-dot {
+            background: #28a745;
+        }
+
+        .discussion-section {
+            background: #f8f9fa;
+            padding: 40px;
+            border-top: 3px solid #667eea;
+        }
+
+        .discussion-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .discussion-header h2 {
+            font-size: 2rem;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+
+        .comment-form {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .comments-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .comment {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            animation: slideIn 0.5s;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .comment-time {
+            color: #868e96;
+            font-size: 0.9rem;
+        }
+
+        .comment-topic {
+            display: inline-block;
+            background: #f1f3f5;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .comment-content {
+            color: #495057;
+            line-height: 1.6;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏥 代謝科 2026 年度目標與 KPI 對照平台</h1>
+            <div class="meta-info">
+                <p>三欄對照版 v1.2 | 更新時間：2025-09-19</p>
+                <p>完整呈現：2022 原訂 → 2024 現況 → 2026 目標</p>
+            </div>
+        </header>
+
+        <div class="view-toggle">
+            <button class="toggle-btn active" onclick="switchView('comparison')">📊 三欄對照檢視</button>
+            <button class="toggle-btn" onclick="switchView('current')">📋 2026 目標檢視</button>
+            <button class="toggle-btn" onclick="switchView('timeline')">📈 時間軸檢視</button>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 搜尋 KPI 內容...">
+        </div>
+
+        <div class="content">
+            <!-- 三欄對照檢視 -->
+            <div class="view-content active" id="comparisonView">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">大目標</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">年度對照</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">40+</div>
+                        <div class="stat-label">KPI 指標</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">2026</div>
+                        <div class="stat-label">目標年度</div>
+                    </div>
+                </div>
+
+                <div class="goal-section">
+                    <div class="goal-header" onclick="toggleSection(this)">
+                        <h2>一、擴大營運量能（檢查、自費、CGM）</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="goal-content">
+                        <table class="comparison-table">
+                            <tr>
+                                <th>項目</th>
+                                <th>2022 原訂目標</th>
+                                <th>2024/07 現況</th>
+                                <th>2026 年 KPI</th>
+                            </tr>
+                            <tr>
+                                <td><strong>併發症檢查</strong></td>
+                                <td><div class="year-2022">各 100 件／月</div></td>
+                                <td><div class="year-2024">單項月量約 170–230 件<br>量能穩定 ✅</div></td>
+                                <td><div class="year-2026">① 維持目前月平均值<br>② 異常→治療/轉介 ≥ 85%<br>③ 回診追蹤 ≥ 85%</div></td>
+                            </tr>
+                            <tr>
+                                <td><strong>自費檢查/藥品</strong></td>
+                                <td><div class="year-2022">推展自費檢查／業務</div></td>
+                                <td><div class="year-2024">自費藥費年增 81%<br>自費總收入年增 46% 📈</div></td>
+                                <td><div class="year-2026">① 自費總收入年增 ≥ 15%<br>② 自費藥費年增 ≥ 15%<br>③ 自費占比年增 ≥ 2%</div></td>
+                            </tr>
+                            <tr>
+                                <td><strong>CGM 強化治療</strong></td>
+                                <td><div class="year-2022">CGM 每週 1 名<br>(≈4／月)</div></td>
+                                <td><div class="year-2024">已有收案與收入<br>可擴量 🚀</div></td>
+                                <td><div class="year-2026">① CGM 新裝增加 10%<br>② 強化治療完成率 ≥ 70%<br>③ TIR ≥ 70% 達 60%<br>④ 自費耗材成長 ≥ 30%</div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="goal-section">
+                    <div class="goal-header" onclick="toggleSection(this)">
+                        <h2>二、醫療部科次專科化</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="goal-content">
+                        <table class="comparison-table">
+                            <tr>
+                                <th>項目</th>
+                                <th>2022 原訂目標</th>
+                                <th>2024/07 現況</th>
+                                <th>2026 年 KPI</th>
+                            </tr>
+                            <tr>
+                                <td><strong>次專科門診</strong></td>
+                                <td><div class="year-2022">DM、甲狀腺、內分泌<br>妊娠DM、基因/精準醫療</div></td>
+                                <td><div class="year-2024">持續運作中</div></td>
+                                <td><div class="year-2026">① 各次專科門診量年增 ≥ 10%<br>② GDM 路徑完成率 ≥ 80%<br>③ AID 年新增 ≥ 2 件</div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="goal-section">
+                    <div class="goal-header" onclick="toggleSection(this)">
+                        <h2>三、精進照護品質與環境</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="goal-content">
+                        <table class="comparison-table">
+                            <tr>
+                                <th>項目</th>
+                                <th>2022 原訂目標</th>
+                                <th>2024/07 現況</th>
+                                <th>2026 年 KPI</th>
+                            </tr>
+                            <tr>
+                                <td><strong>品質認證</strong></td>
+                                <td><div class="year-2022">取得醫策會<br>糖尿病認證</div></td>
+                                <td><div class="year-2024">運作中</div></td>
+                                <td><div class="year-2026">① 通過國家品質競賽<br>② 維持認證稽核 100%</div></td>
+                            </tr>
+                            <tr>
+                                <td><strong>住院衛教</strong></td>
+                                <td><div class="year-2022">—</div></td>
+                                <td><div class="year-2024">住院成人DM<br>衛教執行中</div></td>
+                                <td><div class="year-2026">① 病房衛教覆蓋 ≥ 80%<br>② 30天回診率 ≥ 70%<br>③ 滿意度 ≥ 88%</div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="goal-section">
+                    <div class="goal-header" onclick="toggleSection(this)">
+                        <h2>四、積極配合國家衛政</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="goal-content">
+                        <table class="comparison-table">
+                            <tr>
+                                <th>項目</th>
+                                <th>2022 原訂目標</th>
+                                <th>2024/07 現況</th>
+                                <th>2026 年 KPI</th>
+                            </tr>
+                            <tr>
+                                <td><strong>收案與品質</strong></td>
+                                <td><div class="year-2022">收案 ≥67%<br>A1c<7% ≥34%<br>A1c>9% ≤10%<br>LDL<100 ≥40%<br>ABC ≥10%</div></td>
+                                <td><div class="year-2024">收案約 86.9%<br>(高水位) 🎯</div></td>
+                                <td><div class="year-2026">① 收案率 ≥ 85%<br>② A1c<7% ≥ 38%<br>③ A1c>9% ≤ 8%<br>④ LDL<100 ≥ 50%<br>⑤ ABC達標 ≥ 15%</div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="goal-section">
+                    <div class="goal-header" onclick="toggleSection(this)">
+                        <h2>五、資訊系統與 AI</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="goal-content">
+                        <table class="comparison-table">
+                            <tr>
+                                <th>項目</th>
+                                <th>2022 原訂目標</th>
+                                <th>2024/07 現況</th>
+                                <th>2026 年 KPI</th>
+                            </tr>
+                            <tr>
+                                <td><strong>報告數位化</strong></td>
+                                <td><div class="year-2022">完成報告格式<br>資訊化</div></td>
+                                <td><div class="year-2024">持續擴充</div></td>
+                                <td><div class="year-2026">① 自動產出覆蓋 ≥ 50%<br>② TAT中位數降 ≥ 20%</div></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SDM/VeriSee</strong></td>
+                                <td><div class="year-2022">VeriSee建置<br>insulin AI</div></td>
+                                <td><div class="year-2024">SDM啟動率高<br>VeriSee運作</div></td>
+                                <td><div class="year-2026">① SDM轉換率 ≥ 90%<br>② VeriSee年篩 ≥ 2,000<br>③ 轉介完成 ≥ 85%</div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="goal-section">
+                    <div class="goal-header" onclick="toggleSection(this)">
+                        <h2>六、人才培育與留任</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="goal-content">
+                        <table class="comparison-table">
+                            <tr>
+                                <th>項目</th>
+                                <th>2022 原訂目標</th>
+                                <th>2024/07 現況</th>
+                                <th>2026 年 KPI</th>
+                            </tr>
+                            <tr>
+                                <td><strong>人力與能力</strong></td>
+                                <td><div class="year-2022">四名主治<br>一名研究助理</div></td>
+                                <td><div class="year-2024">持續招募中</div></td>
+                                <td><div class="year-2026">① 主治醫師淨增 ≥ 1<br>② Fellow ≥ 1<br>③ CGM認證 ≥ 6人<br>④ 訓練通過率 ≥ 90%</div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="goal-section">
+                    <div class="goal-header" onclick="toggleSection(this)">
+                        <h2>七、醫學研究與創新</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="goal-content">
+                        <table class="comparison-table">
+                            <tr>
+                                <th>項目</th>
+                                <th>2022 原訂目標</th>
+                                <th>2024/07 現況</th>
+                                <th>2026 年 KPI</th>
+                            </tr>
+                            <tr>
+                                <td><strong>研究產出</strong></td>
+                                <td><div class="year-2022">論文≥1<br>口頭/海報≥1<br>個管師論文≥1</div></td>
+                                <td><div class="year-2024">研究計畫持續</div></td>
+                                <td><div class="year-2026">① SCI/Scopus ≥ 2<br>② 多中心試驗 ≥ 1<br>③ 實務研究 ≥ 1</div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="goal-section">
+                    <div class="goal-header" onclick="toggleSection(this)">
+                        <h2>八、ESG/CSR（P14 共照跨科）</h2>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="goal-content">
+                        <table class="comparison-table">
+                            <tr>
+                                <th>項目</th>
+                                <th>2022 原訂目標</th>
+                                <th>2024/07 現況</th>
+                                <th>2026 年 KPI</th>
+                            </tr>
+                            <tr>
+                                <td><strong>P14共照跨科</strong></td>
+                                <td><div class="year-2022">社區每季1場<br>媒體每半年1場</div></td>
+                                <td><div class="year-2024">新陳代謝科<br>占比約80%</div></td>
+                                <td><div class="year-2026">① 他科占比增 ≥ 5%<br>② 心內/家醫拓點<br>③ 每季跨科聯席會</div></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2026 目標檢視 -->
+            <div class="view-content" id="currentView">
+                <!-- 這裡可以放原本的 2026 年目標內容 -->
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number">8</div>
+                        <div class="stat-label">大目標</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">40+</div>
+                        <div class="stat-label">KPI 指標</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">2026</div>
+                        <div class="stat-label">目標年度</div>
+                    </div>
+                </div>
+                <p style="text-align: center; padding: 40px; color: #868e96;">請切換至「三欄對照檢視」查看完整內容</p>
+            </div>
+
+            <!-- 時間軸檢視 -->
+            <div class="view-content" id="timelineView">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot">2022</div>
+                        <strong>初始規劃</strong>
+                        <p style="color: #868e96; font-size: 0.9rem;">設定基礎目標</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">2024</div>
+                        <strong>現況評估</strong>
+                        <p style="color: #868e96; font-size: 0.9rem;">檢視執行成果</p>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">2026</div>
+                        <strong>修訂目標</strong>
+                        <p style="color: #868e96; font-size: 0.9rem;">優化 KPI 設定</p>
+                    </div>
+                </div>
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 15px;">
+                    <h3 style="margin-bottom: 20px;">📊 關鍵進展摘要</h3>
+                    <ul style="line-height: 2;">
+                        <li>🎯 收案率從 67% 目標提升至實際 86.9%（2024）</li>
+                        <li>💰 自費藥費年增達 81%，超越預期</li>
+                        <li>📈 併發症檢查量從 100件/月成長至 170-230件/月</li>
+                        <li>🏥 新增住院衛教服務，覆蓋率目標 80%</li>
+                        <li>🤖 AI 系統 SDM 與 VeriSee 成功上線運作</li>
+                        <li>🔬 研究產出目標從 1 篇提升至 2 篇 SCI 論文</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="discussion-section">
+            <div class="discussion-header">
+                <h2>💬 討論區與留言</h2>
+                <p>歡迎分享您對 2026 年 KPI 目標的想法與建議</p>
+            </div>
+
+            <div class="comment-form">
+                <h3>發表留言</h3>
+                <div class="form-group">
+                    <label for="name">姓名</label>
+                    <input type="text" id="name" placeholder="請輸入您的姓名">
+                </div>
+                <div class="form-group">
+                    <label for="department">部門/職稱</label>
+                    <input type="text" id="department" placeholder="例如：代謝科主治醫師">
+                </div>
+                <div class="form-group">
+                    <label for="topic">討論主題</label>
+                    <select id="topic">
+                        <option value="">請選擇主題</option>
+                        <option value="營運量能">一、擴大營運量能</option>
+                        <option value="次專科化">二、次專科化</option>
+                        <option value="照護品質">三、照護品質</option>
+                        <option value="國家衛政">四、國家衛政</option>
+                        <option value="資訊系統">五、資訊系統與AI</option>
+                        <option value="人才培育">六、人才培育</option>
+                        <option value="醫學研究">七、醫學研究</option>
+                        <option value="ESG/CSR">八、ESG/CSR</option>
+                        <option value="其他建議">其他建議</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="message">留言內容</label>
+                    <textarea id="message" placeholder="請分享您的想法、建議或問題..."></textarea>
+                </div>
+                <button class="submit-btn" onclick="submitComment()">發表留言</button>
+            </div>
+
+            <div class="comments-list" id="commentsList">
+                <div class="comment">
+                    <div class="comment-header">
+                        <span class="comment-author">張醫師 - 代謝科主治</span>
+                        <span class="comment-time">2025-09-20 09:30</span>
+                    </div>
+                    <span class="comment-topic">資訊系統</span>
+                    <div class="comment-content">
+                        從三欄對照可以看出 CGM 的成長潛力很大，從每月 4 件到現在可擴量，建議增加對醫護人員的判讀訓練時數要求，確保大家都能正確解讀數據。
+                    </div>
+                </div>
+                <div class="comment">
+                    <div class="comment-header">
+                        <span class="comment-author">李護理師</span>
+                        <span class="comment-time">2025-09-20 10:15</span>
+                    </div>
+                    <span class="comment-topic">照護品質</span>
+                    <div class="comment-content">
+                        住院衛教覆蓋率 80% 是個挑戰，看到 2022 年時還沒有這個項目，到 2024 已經開始執行，建議可以先從重點病房開始推動，再逐步擴展。
+                    </div>
+                </div>
+                <div class="comment">
+                    <div class="comment-header">
+                        <span class="comment-author">王個管師</span>
+                        <span class="comment-time">2025-09-20 11:00</span>
+                    </div>
+                    <span class="comment-topic">國家衛政</span>
+                    <div class="comment-content">
+                        收案率從 2022 年目標的 67% 到現在已達 86.9%，真的很不容易！2026 年設定 85% 很合理，重點應該放在品質指標的提升。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Switch view function
+        function switchView(viewName) {
+            // Update buttons
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update views
+            document.querySelectorAll('.view-content').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(viewName + 'View').classList.add('active');
+        }
+
+        // Toggle section visibility
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            content.classList.toggle('active');
+            icon.style.transform = content.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const sections = document.querySelectorAll('.goal-section');
+            
+            sections.forEach(section => {
+                const content = section.textContent.toLowerCase();
+                if (searchTerm === '') {
+                    section.style.display = 'block';
+                } else if (content.includes(searchTerm)) {
+                    section.style.display = 'block';
+                    if (!section.querySelector('.goal-content').classList.contains('active')) {
+                        section.querySelector('.goal-header').click();
+                    }
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        });
+
+        // Submit comment
+        function submitComment() {
+            const name = document.getElementById('name').value;
+            const department = document.getElementById('department').value;
+            const topic = document.getElementById('topic').value;
+            const message = document.getElementById('message').value;
+            
+            if (!name || !message) {
+                alert('請填寫姓名和留言內容！');
+                return;
+            }
+            
+            const now = new Date();
+            const timeString = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            
+            const commentHtml = `
+                <div class="comment" style="animation: slideIn 0.5s;">
+                    <div class="comment-header">
+                        <span class="comment-author">${name}${department ? ' - ' + department : ''}</span>
+                        <span class="comment-time">${timeString}</span>
+                    </div>
+                    ${topic ? '<span class="comment-topic">' + topic + '</span>' : ''}
+                    <div class="comment-content">${message}</div>
+                </div>
+            `;
+            
+            document.getElementById('commentsList').insertAdjacentHTML('afterbegin', commentHtml);
+            
+            // Clear form
+            document.getElementById('name').value = '';
+            document.getElementById('department').value = '';
+            document.getElementById('topic').value = '';
+            document.getElementById('message').value = '';
+            
+            // Show success message
+            const btn = document.querySelector('.submit-btn');
+            const originalText = btn.textContent;
+            btn.textContent = '✓ 留言已發表！';
+            btn.style.background = 'linear-gradient(135deg, #51cf66 0%, #339af0 100%)';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            }, 2000);
+        }
+
+        // Initialize - open first section
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.goal-header').click();
+        });
+    </script>
+</body>
+</html>
