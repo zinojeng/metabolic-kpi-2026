@@ -1,0 +1,20 @@
+{
+  "name": "metabolic-kpi-2026",
+  "build": {
+    "framework": "static"
+  },
+  "deploy": {
+    "env": "production"
+  },
+  "domains": [
+    {
+      "domain": "metabolic-kpi-2026.zeabur.app"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/metabolis-kpi-terative.html"
+    }
+  ]
+}
